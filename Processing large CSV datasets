@@ -1,0 +1,74 @@
+import pandas as pd
+import json
+
+# Function to process CSV file
+def process_csv(input_file, output_file):
+    try:
+        # Read CSV file
+        df = pd.read_csv(input_file)
+
+        # Data Cleaning
+        df.drop_duplicates(inplace=True)      # Remove duplicates
+        df.dropna(inplace=True)               # Remove missing values
+
+        # Data Transformation
+        df.columns = [col.upper() for col in df.columns]
+
+        # Save cleaned data
+        df.to_csv(output_file, index=False)
+
+        print("CSV data processed successfully!")
+        print("Saved to:", output_file)
+
+    except Exception as e:
+        print("Error:", e)
+
+
+# Function to process JSON file
+def process_json(input_file, output_file):
+    try:
+        # Read JSON file
+        with open(input_file, 'r') as file:
+            data = json.load(file)
+
+        cleaned_data = []
+
+        for record in data:
+            # Remove records with missing values
+            if all(value != "" and value is not None for value in record.values()):
+                # Convert keys to uppercase
+                transformed_record = {
+                    key.upper(): value
+                    for key, value in record.items()
+                }
+                cleaned_data.append(transformed_record)
+
+        # Save processed JSON
+        with open(output_file, 'w') as file:
+            json.dump(cleaned_data, file, indent=4)
+
+        print("JSON data processed successfully!")
+        print("Saved to:", output_file)
+
+    except Exception as e:
+        print("Error:", e)
+
+
+# Main Program
+print("1. Process CSV File")
+print("2. Process JSON File")
+
+choice = int(input("Enter your choice: "))
+
+if choice == 1:
+    input_file = input("Enter CSV file name: ")
+    output_file = input("Enter output CSV file name: ")
+    process_csv(input_file, output_file)
+
+elif choice == 2:
+    input_file = input("Enter JSON file name: ")
+    output_file = input("Enter output JSON file name: ")
+    process_json(input_file, output_file)
+
+else:
+    print("Invalid Choice!")

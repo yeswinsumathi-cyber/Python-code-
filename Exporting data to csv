@@ -1,0 +1,46 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+# List of web pages to scrape
+urls = [
+    "https://example.com/page1",
+    "https://example.com/page2",
+    "https://example.com/page3"
+]
+
+# Store extracted data
+data_list = []
+
+for url in urls:
+    try:
+        # Send request to website
+        response = requests.get(url)
+        response.raise_for_status()
+
+        # Parse HTML content
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Example: Extract page title
+        title = soup.title.text.strip()
+
+        # Example: Extract all headings (h1)
+        headings = [h.text.strip() for h in soup.find_all("h1")]
+
+        # Save data
+        data_list.append({
+            "URL": url,
+            "Title": title,
+            "Headings": ", ".join(headings)
+        })
+
+    except Exception as e:
+        print(f"Error scraping {url}: {e}")
+
+# Export data to CSV
+with open("scraped_data.csv", "w", newline="", encoding="utf-8") as file:
+    writer = csv.DictWriter(file, fieldnames=["URL", "Title", "Headings"])
+    writer.writeheader()
+    writer.writerows(data_list)
+
+print("Data exported successfully to scraped_data.csv")
